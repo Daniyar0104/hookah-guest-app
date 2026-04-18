@@ -1,4 +1,4 @@
-[hookah-guest-app.html](https://github.com/user-attachments/files/26852930/hookah-guest-app.html)
+[hookah-guest-app (3).html](https://github.com/user-attachments/files/26853317/hookah-guest-app.3.html)
 <!DOCTYPE html>
 <html lang="ru" data-theme="dark">
 <head>
@@ -64,11 +64,15 @@
     .stat-label{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-muted)}
     .stat-value{font-size:clamp(1.05rem,1rem + .8vw,1.5rem);font-weight:800;line-height:1.12}
     .footer-note{padding:clamp(1.25rem,3vw,2rem);display:grid;gap:1rem;border-top:1px solid var(--color-border);background:rgba(255,255,255,.025)}
-    .master-box{padding:1rem 1.1rem;border-radius:var(--radius-lg);background:var(--color-primary-soft);border:1px dashed rgba(215,139,98,.38)}
-    .signature{display:grid;gap:.35rem;padding-top:.25rem}
-    .signature strong{font-size:1rem}
+    .contact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+    .contact-card{padding:1rem 1.1rem;border-radius:var(--radius-lg);border:1px solid var(--color-border);background:rgba(255,255,255,.03);display:grid;gap:.65rem}
+    .contact-card strong{font-size:1rem;line-height:1.25}
+    .contact-card a{color:var(--color-text);text-decoration:none}
+    .contact-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.8rem 1rem;border-radius:var(--radius-full);background:var(--color-primary);color:#fff !important;font-weight:700}
+    .contact-link.secondary{background:var(--color-secondary)}
+    .contact-meta{font-size:var(--text-sm);color:var(--color-text-muted)}
     @media (max-width:1080px){.app{grid-template-columns:1fr}.panel{border-right:0;border-bottom:1px solid var(--color-border)}.result-card{min-height:auto}}
-    @media (max-width:720px){.panel,.result{padding:1rem}.field,.hero-card{padding:1rem}.option-grid,.stats{grid-template-columns:1fr}.brand{align-items:flex-start;flex-direction:column}.hookah-name{max-width:100%}}
+    @media (max-width:720px){.panel,.result{padding:1rem}.field,.hero-card{padding:1rem}.option-grid,.stats,.contact-grid{grid-template-columns:1fr}.brand{align-items:flex-start;flex-direction:column}.hookah-name{max-width:100%}}
   </style>
 </head>
 <body>
@@ -170,6 +174,20 @@
 
         <div class="footer-note">
           <div class="inline-help" id="validationText">Для полной карточки выберите крепость, вкус, цену, тягу, способ прогрева и время подачи.</div>
+          <div class="contact-grid">
+            <article class="contact-card">
+              <div class="eyebrow">Друзья Говорят · 50 лет Октября 57В</div>
+              <strong>Telegram и быстрый переход с характеристиками кальяна</strong>
+              <a class="contact-meta" href="tel:+79829888998">+7 982 988 8998</a>
+              <a class="contact-link" id="telegramBtn57" href="https://t.me/friends_talk_tmn" target="_blank" rel="noopener noreferrer">Открыть Telegram 57В</a>
+            </article>
+            <article class="contact-card">
+              <div class="eyebrow">Друзья Говорят · Малыгина 90</div>
+              <strong>Telegram и быстрый переход с характеристиками кальяна</strong>
+              <a class="contact-meta" href="tel:+79129926869">+7 912 992 6869</a>
+              <a class="contact-link secondary" id="telegramBtn90" href="https://t.me/friendstalk4" target="_blank" rel="noopener noreferrer">Открыть Telegram Малыгина 90</a>
+            </article>
+          </div>
         </div>
       </section>
     </main>
@@ -225,6 +243,25 @@
 
     const findNote = (group, value) => (data[group].find(item => typeof item === 'string' ? item === value : item.value === value)?.note) || 'Не выбрано';
     const ready = () => ['strength','profile','cold','price','draw','heat','timing'].every(key => !!state[key]);
+    const buildTelegramText = () => {
+      const lines = [
+        'Здравствуйте! Отправляю выбранный кальян:',
+        `Крепость: ${state.strength || 'не выбрано'}`,
+        `Основной вкус: ${state.profile || 'не выбрано'}`,
+        `Стоп вкусы: ${state.stops.length ? state.stops.join(', ') : 'нет'}`,
+        `Холодок: ${state.cold || 'не выбрано'}`,
+        `Стоимость: ${state.price ? `${state.price} — ${findNote('price', state.price)}` : 'не выбрано'}`,
+        `Тяга: ${state.draw || 'не выбрано'}`,
+        `Прогрев: ${state.heat || 'не выбрано'}`,
+        `Подача: ${state.timing || 'не выбрано'}`,
+        `Комментарий: ${state.guestComment || 'нет'}`
+      ];
+      return encodeURIComponent(lines.join('\n'));
+    };
+    const updateTelegramLinks = () => {
+      document.getElementById('telegramBtn57').href = `https://t.me/friends_talk_tmn?text=${buildTelegramText()}`;
+      document.getElementById('telegramBtn90').href = `https://t.me/friendstalk4?text=${buildTelegramText()}`;
+    };
 
     function renderAll(){
       Object.keys(data).forEach(renderGroup);
@@ -246,8 +283,9 @@
       ];
       document.getElementById('stats').innerHTML = cards.map(([label,value,note]) => `<article class="stat"><div class="stat-label">${label}</div><div class="stat-value">${value}</div><div class="stat-note">${note}</div></article>`).join('');
       document.getElementById('validationText').textContent = ready()
-        ? 'Карточка готова. Покажите её гостю, затем запишите итог от мастера и сохраните скриншот.'
+        ? 'Карточка готова. Можно сразу открыть Telegram нужного филиала и отправить выбранные характеристики.'
         : 'Для полной карточки выберите крепость, вкус, цену, тягу, способ прогрева и время подачи.';
+      updateTelegramLinks();
     }
 
     document.getElementById('guestComment').addEventListener('input', renderAll);
